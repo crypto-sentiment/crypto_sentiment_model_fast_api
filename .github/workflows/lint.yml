@@ -1,0 +1,29 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+      - name: Run black
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./"
+          version: "22.3"
+      - name: Run isort
+        uses: jamescurtin/isort-action@master
+        with:
+          configuration: .isort.cfg
