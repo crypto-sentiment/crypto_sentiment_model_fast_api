@@ -14,7 +14,7 @@ with open(project_root / "config.yaml") as f:
     params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
 
 
-def initialize_model(params: dict) -> Pipeline:
+def initialize_model(params: Dict[str, Any]) -> Pipeline:
     """
     Initializes the model, an Sklearn Pipeline with two steps: tf-idf and logreg.
     :param params: a dictionary read from the config.yml file
