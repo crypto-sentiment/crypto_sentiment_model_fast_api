@@ -1,26 +1,24 @@
 import pickle
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List
 
 import yaml
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 
-from src.data import read_train_data
-from src.model import initialize_model
-from src.utils import get_project_root, timer
+from .data import read_train_data
+from .model import initialize_model
+from .utils import get_project_root, timer
 
 # loading config params
 project_root: Path = get_project_root()
 
-with open(str(project_root / "config.yml")) as f:
-    params = yaml.load(f, Loader=yaml.FullLoader)
+with open(project_root / "config.yaml") as f:
+    params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
     cross_val_params = params["cross_validation"]
 
 
-def train_model(
-    train_texts: List[str], train_targets: List[int], cross_val: bool = False
-) -> Pipeline:
+def train_model(train_texts: List[str], train_targets: List[int], cross_val: bool = False) -> Pipeline:
     """
     Trains the model defined in model.py with the optional flag to add cross-validation.
     :param train_texts: a list of texts to train the model, the model is an sklearn Pipeline
@@ -53,11 +51,7 @@ def train_model(
             )
 
             avg_cross_score = round(100 * cv_results.mean(), 2)
-            print(
-                "Average cross-validation {}: {}%.".format(
-                    cross_val_params["cv_avg_f1_scoring"], avg_cross_score
-                )
-            )
+            print("Average cross-validation {}: {}%.".format(cross_val_params["cv_avg_f1_scoring"], avg_cross_score))
     return model
 
 

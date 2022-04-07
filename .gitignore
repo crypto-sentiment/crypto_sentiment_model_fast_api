@@ -161,5 +161,3 @@ cython_debug/
 
 # custom
 .DS_Store
-# venv name
-crypto_sentiment_mlops_venv

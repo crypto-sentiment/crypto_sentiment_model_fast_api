@@ -19,7 +19,7 @@ cross_validation:                             # Params of cross-validation
 model:                                        # Params of the model defined in src/model.py
   name: "Tf-Idf & logreg"                     # TODO replace this with setting up MLFlow tracking
   version: 0.1.0                              # TODO replace this with setting up MLFlow tracking
-  path_to_model: static/models/logit_tfidf_btc_sentiment2.pkl # TODO replace this with setting up MLFlow tracking
+  path_to_model: static/models/logit_tfidf_btc_sentiment.pkl # TODO replace this with setting up MLFlow tracking
   tfidf: # See https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
     stop_words: english
     ngram_range: '(1, 2)'

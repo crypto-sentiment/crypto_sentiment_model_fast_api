@@ -7,13 +7,13 @@ from fastapi import FastAPI
 from fastapi_health import health
 from sklearn.pipeline import Pipeline
 
-from src.inference import model_inference
-from src.utils import get_project_root
+from .inference import model_inference
+from .utils import get_project_root
 
 # loading config params
 project_root: Path = get_project_root()
 
-with open(str(project_root / "config.yml")) as f:
+with open(project_root / "config.yaml") as f:
     params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
 
 
