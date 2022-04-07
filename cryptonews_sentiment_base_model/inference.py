@@ -18,7 +18,7 @@ def model_inference(
     model: Pipeline,
     input_text: str,
     class_names: List[str] = params["data"]["class_names"],
-):
+) -> Dict[str, str]:
     """
     Run model inference with the given model
 
