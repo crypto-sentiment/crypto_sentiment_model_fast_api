@@ -1,23 +1,13 @@
-from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import numpy as np
-import yaml
 from sklearn.pipeline import Pipeline
-
-from .utils import get_project_root
-
-# loading config params
-project_root: Path = get_project_root()
-
-with open(project_root / "config.yaml") as f:
-    params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
 
 
 def model_inference(
     model: Pipeline,
     input_text: str,
-    class_names: List[str] = params["data"]["class_names"],
+    class_names: List[str],
 ):
     """
     Run model inference with the given model

@@ -1,29 +1,20 @@
-from pathlib import Path
 from typing import Any, Dict
 
-import yaml
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-from .utils import get_project_root
 
-# loading config params
-project_root: Path = get_project_root()
-with open(project_root / "config.yaml") as f:
-    params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
-
-
-def initialize_model(params: dict) -> Pipeline:
+def initialize_model(model_params: Dict[str, Any]) -> Pipeline:
     """
     Initializes the model, an Sklearn Pipeline with two steps: tf-idf and logreg.
-    :param params: a dictionary read from the config.yml file
+    :param model_params: a dictionary read from the `config.yml` file, section "model"
     :return: an Sklearn Pipeline object
     """
 
-    # TODO define a model wrapper class
-    tf_idf_params = params["model"]["tfidf"]
-    logreg_params = params["model"]["logreg"]
+    # TODO define a model wrapper class instead
+    tf_idf_params = model_params["tfidf"]
+    logreg_params = model_params["logreg"]
 
     # initialize TfIdf, logreg, and the Pipeline with the params from a config file
     # TODO support arbitrary params, not only the listed ones.

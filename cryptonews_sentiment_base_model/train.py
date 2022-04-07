@@ -1,38 +1,33 @@
 import pickle
-from pathlib import Path
 from typing import Any, Dict, List
 
-import yaml
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 
 from .data import read_train_data
 from .model import initialize_model
-from .utils import get_project_root, timer
-
-# loading config params
-project_root: Path = get_project_root()
-
-with open(project_root / "config.yaml") as f:
-    params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
-    cross_val_params = params["cross_validation"]
+from .utils import get_project_root, load_config_params, timer
 
 
-def train_model(train_texts: List[str], train_targets: List[int], cross_val: bool = False) -> Pipeline:
+def train_model(
+    train_texts: List[str], train_targets: List[int], model_params: Dict[str, Any], cross_val_params: Dict[str, Any]
+) -> Pipeline:
     """
     Trains the model defined in model.py with the optional flag to add cross-validation.
     :param train_texts: a list of texts to train the model, the model is an sklearn Pipeline
                         with tf-idf as a first step, so raw texts can be fed into the model
     :param train_targets: a list of targets (ints)
-    :param cross_val: whether to perform cross-validation
+    :param model_params: a dictionary with model parameters, see the "model" section of the `config.yaml` file
+    :param cross_val_params: a dictionary with cross-validation parameters,
+                             see the "cross_validation" section of the `config.yaml` file
     :return: model – the trained model, an Sklearn Pipeline object
     """
 
     with timer("Training the model"):
-        model = initialize_model(params)
+        model = initialize_model(model_params=model_params)
         model.fit(X=train_texts, y=train_targets)
 
-    if cross_val:
+    if cross_val_params["cv_perform_cross_val"]:
         with timer("Cross-validation"):
             skf = StratifiedKFold(
                 n_splits=cross_val_params["cv_n_splits"],
@@ -57,15 +52,20 @@ def train_model(train_texts: List[str], train_targets: List[int], cross_val: boo
 
 if __name__ == "__main__":
 
-    with timer("Reading and processing data"):
-        train_df = read_train_data(params=params)
+    # loading project-wide configuration params
+    params: Dict[str, Any] = load_config_params()
+    project_root = get_project_root()
 
-    with timer("Training the model"):
-        model = train_model(
-            train_texts=train_df[params["data"]["text_field_name"]],
-            train_targets=train_df[params["data"]["label_field_name"]],
-            cross_val=cross_val_params["cv_perform_cross_val"],
-        )
+    with timer("Reading and processing data"):
+        path_to_data = project_root / params["data"]["path_to_data"] / params["data"]["train_filename"]
+        train_df = read_train_data(path_to_data=path_to_data)
+
+    model = train_model(
+        train_texts=train_df[params["data"]["text_field_name"]],
+        train_targets=train_df[params["data"]["label_field_name"]],
+        model_params=params["model"],
+        cross_val_params=params["cross_validation"],
+    )
 
     # Saving the model as a pickle file
     with open(params["model"]["path_to_model"], "wb") as f:

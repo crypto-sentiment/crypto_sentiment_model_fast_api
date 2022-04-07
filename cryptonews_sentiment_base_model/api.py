@@ -1,31 +1,26 @@
 import pickle
-from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-import yaml
 from fastapi import FastAPI
 from fastapi_health import health
 from sklearn.pipeline import Pipeline
 
 from .inference import model_inference
-from .utils import get_project_root
+from .utils import load_config_params
 
-# loading config params
-project_root: Path = get_project_root()
-
-with open(project_root / "config.yaml") as f:
-    params: Dict[str, Any] = yaml.load(f, Loader=yaml.FullLoader)
+# loading project-wide configuration params
+params: Dict[str, Any] = load_config_params()
 
 
 # TODO move the following two methods to the model wrapper to be defined in model.py
 # loading the model into memory
-def load_model(model_path):
+def load_model(model_path) -> Pipeline:
     with open(model_path, "rb") as f:
         model: Pipeline = pickle.load(f)
     return model
 
 
-model = load_model(params["model"]["path_to_model"])
+model: Pipeline = load_model(params["model"]["path_to_model"])
 
 
 # check if model is loaded correctly
@@ -53,7 +48,9 @@ def get_classifier_details() -> Dict[str, Any]:
 
 @app.post("/classify", status_code=200)
 def classify_content(
-    input_json: Dict[str, str], text_field_name: str = params["data"]["text_field_name"]
+    input_json: Dict[str, str],
+    text_field_name: str = params["data"]["text_field_name"],
+    class_names: List[str] = params["data"]["class_names"],
 ) -> Dict[str, str]:
     """
     Gets a JSON with text fields, processes them, runs model prediction
@@ -64,4 +61,8 @@ def classify_content(
     # TODO implement error handling, see https://fastapi.tiangolo.com/tutorial/handling-errors/
     assert text_field_name in input_json
 
-    return model_inference(model=model, input_text=input_json.get(text_field_name, ""))
+    response_dict = model_inference(
+        model=model, input_text=input_json.get(text_field_name, ""), class_names=class_names
+    )
+
+    return response_dict
