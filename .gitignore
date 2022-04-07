@@ -161,4 +161,4 @@ cython_debug/
 
 # custom
 .DS_Store
-.pkl
+*.pkl

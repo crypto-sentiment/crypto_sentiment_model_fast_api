@@ -47,16 +47,20 @@ def get_classifier_details() -> Dict[str, Any]:
 
 
 @app.post("/classify", status_code=200)
-def classify_content(
-    input_json: Dict[str, str],
-    text_field_name: str = params["data"]["text_field_name"],
-    class_names: List[str] = params["data"]["class_names"],
-) -> Dict[str, str]:
+def classify_content(input_json: Dict[str, str]) -> Dict[str, str]:
     """
     Gets a JSON with text fields, processes them, runs model prediction
     and returns the resulting predicted probabilities for each class.
+
+    :param input_json: input JSON structured as {text_field_name: text_field_value},
+                       e.g. {"title": "BTC drops by 10% this Friday"}
+
     :return: a Response with a dictionary mapping class names to predicted probabilities
     """
+
+    # passing this both as arguments to the current function didn't work for me
+    text_field_name: str = params["data"]["text_field_name"]
+    class_names: List[str] = params["data"]["class_names"]
 
     # TODO implement error handling, see https://fastapi.tiangolo.com/tutorial/handling-errors/
     assert text_field_name in input_json

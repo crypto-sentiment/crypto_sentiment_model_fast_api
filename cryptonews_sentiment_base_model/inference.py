@@ -4,11 +4,8 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 
 
-def model_inference(
-    model: Pipeline,
-    input_text: str,
-    class_names: List[str],
-):
+def model_inference(model: Pipeline, input_text: str, class_names: List[str]) -> Dict[str, str]:
+
     """
     Run model inference with the given model
 
