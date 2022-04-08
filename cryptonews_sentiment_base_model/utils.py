@@ -1,3 +1,5 @@
+import logging
+import logging.config
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -27,8 +29,22 @@ def load_config_params() -> Dict[str, Any]:
     return params
 
 
+def get_logger(name) -> logging.Logger:
+    """
+
+    :param name: name – any string
+    :return: Python logging.Logger object
+    """
+
+    params = load_config_params()
+    log_config = params["logging"]
+    logging.config.dictConfig(config=log_config)
+
+    return logging.getLogger(name)
+
+
 @contextmanager
-def timer(name):
+def timer(name, logger):
     """
     A context manager to report running times.
     Example usage:
@@ -37,11 +53,12 @@ def timer(name):
             pass
         ```
     :param name: any string
+    :param logger: logging object
     :return: None
     """
     t0 = time.time()
     yield
-    print(f"[{name}] done in {time.time() - t0:.0f} s")
+    logger.info(f"[{name}] done in {time.time() - t0:.0f} s")
 
 
 if __name__ == "__main__":

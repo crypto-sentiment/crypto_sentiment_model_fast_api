@@ -22,6 +22,7 @@ def initialize_model(model_params: Dict[str, Any]) -> Pipeline:
         stop_words=tf_idf_params["stop_words"],
         ngram_range=eval(tf_idf_params["ngram_range"]),
         lowercase=bool(tf_idf_params["lowercase"]),
+        analyzer=tf_idf_params["analyzer"],
         max_features=int(tf_idf_params["max_features"]),
     )
 

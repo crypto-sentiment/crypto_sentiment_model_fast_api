@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 from typing import Any, Dict, List
 
 from sklearn.model_selection import StratifiedKFold, cross_val_score
@@ -6,7 +7,9 @@ from sklearn.pipeline import Pipeline
 
 from .data import read_train_data
 from .model import initialize_model
-from .utils import get_project_root, load_config_params, timer
+from .utils import get_logger, get_project_root, load_config_params, timer
+
+logger = get_logger(Path(__file__).name)
 
 
 def train_model(
@@ -23,12 +26,12 @@ def train_model(
     :return: model – the trained model, an Sklearn Pipeline object
     """
 
-    with timer("Training the model"):
+    with timer("Training the model", logger=logger):
         model = initialize_model(model_params=model_params)
         model.fit(X=train_texts, y=train_targets)
 
     if cross_val_params["cv_perform_cross_val"]:
-        with timer("Cross-validation"):
+        with timer("Cross-validation", logger=logger):
             skf = StratifiedKFold(
                 n_splits=cross_val_params["cv_n_splits"],
                 shuffle=cross_val_params["cv_shuffle"],
@@ -42,11 +45,11 @@ def train_model(
                 y=train_targets,
                 cv=skf,
                 n_jobs=cross_val_params["cv_n_jobs"],
-                scoring=cross_val_params["cv_avg_f1_scoring"],
+                scoring=cross_val_params["cv_scoring"],
             )
 
             avg_cross_score = round(100 * cv_results.mean(), 2)
-            print("Average cross-validation {}: {}%.".format(cross_val_params["cv_avg_f1_scoring"], avg_cross_score))
+            logger.info("Average cross-validation {}: {}%.".format(cross_val_params["cv_scoring"], avg_cross_score))
     return model
 
 
@@ -56,7 +59,7 @@ if __name__ == "__main__":
     params: Dict[str, Any] = load_config_params()
     project_root = get_project_root()
 
-    with timer("Reading and processing data"):
+    with timer("Reading and processing data", logger=logger):
         path_to_data = project_root / params["data"]["path_to_data"] / params["data"]["train_filename"]
         train_df = read_train_data(path_to_data=path_to_data)
 

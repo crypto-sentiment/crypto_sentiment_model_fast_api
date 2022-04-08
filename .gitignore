@@ -162,3 +162,4 @@ cython_debug/
 # custom
 .DS_Store
 *.pkl
+data/20190110_train_4500.csv

@@ -1,7 +1,7 @@
 data:
   path_to_data: data                          # Local path where the train and validation data should be placed
                                               # in order to run the model training
-  train_filename: toy_train.csv               # Filename of the training data
+  train_filename: toy_train.csv     # Filename of the training data
   text_field_name: title
   label_field_name: sentiment
   num_classes: 3
@@ -14,7 +14,7 @@ cross_validation:                             # Params of cross-validation
   cv_shuffle: true
   cv_random_state: 17
   cv_n_jobs: 4
-  cv_avg_f1_scoring: f1_micro                 # Scoring name compatible with Sklearn
+  cv_scoring: accuracy                        # Scoring name compatible with Sklearn
 
 model:                                        # Params of the model defined in src/model.py
   name: "Tf-Idf & logreg"                     # TODO replace this with setting up MLFlow tracking
@@ -22,14 +22,36 @@ model:                                        # Params of the model defined in s
   path_to_model: static/models/logit_tfidf_btc_sentiment.pkl # TODO replace this with setting up MLFlow tracking
   tfidf: # See https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
     stop_words: english
-    ngram_range: '(1, 2)'
+    ngram_range: '(1, 5)'
+    analyzer: char
+    min_df: 8
     lowercase: true
-    max_features: 50000
+    max_features: 100000
   logreg: # See https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
-    C: 1
+    C: 2.7
     solver: lbfgs
     multi_class: multinomial
     random_state: 17
-    max_iter: 300
-    n_jobs: 8
+    max_iter: 500
+    n_jobs: 4
     fit_intercept: false
+
+logging:
+  version: 1
+  formatters:
+    app:
+      format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: app
+      stream: ext://sys.stdout
+  loggers:
+    appLogger:
+      level: INFO
+      handlers: [console]
+      propagate: no
+  root:
+    level: INFO
+    handlers: [console]
