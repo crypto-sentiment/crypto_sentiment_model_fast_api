@@ -57,3 +57,7 @@ curl --location --request POST 'http://127.0.0.1:8000/classify' \
 
 * Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 * ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+### Build docs
+
+`poetry run sphinx-build -a -b html docs/ docs/_build`
