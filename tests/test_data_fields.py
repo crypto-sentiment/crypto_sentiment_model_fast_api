@@ -2,8 +2,8 @@ from pathlib import Path
 
 import yaml
 
-from cryptonews_sentiment_base_model.data import read_train_data
-from cryptonews_sentiment_base_model.utils import get_project_root
+from cryptonews_sentiment_analysis_app.data import read_train_data
+from cryptonews_sentiment_analysis_app.utils import get_project_root
 
 # loading config params
 project_root: Path = get_project_root()

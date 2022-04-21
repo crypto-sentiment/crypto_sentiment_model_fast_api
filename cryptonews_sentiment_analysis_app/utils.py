@@ -4,8 +4,30 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict
+from enum import Enum
 
-import yaml
+import pydoc
+
+class ModelConfigFields(str, Enum):
+    PIPELINE = "model_pipeline"
+    MODEL_ENGINE = "model_engine"
+    MODEL_PREFIX = "model_"
+    CROSS_VAL_PARAMS = "cross_val_params"
+
+def object_from_dict(d, default_kwargs=None):
+    kwargs = d.copy()
+    object_type = kwargs.pop("type")
+        
+    if isinstance(default_kwargs, dict):
+        kwargs.update(default_kwargs)
+
+    # support nested constructions
+    for key, value in kwargs.items():
+        if isinstance(value, dict) and "type" in value:
+            value = object_from_dict(value)
+            kwargs[key] = value
+
+    return pydoc.locate(object_type)(**kwargs)
 
 
 def get_project_root() -> Path:
@@ -63,5 +85,3 @@ def timer(name, logger):
 
 if __name__ == "__main__":
     print(get_project_root().absolute())
-    params = load_config_params()
-    print(params)
