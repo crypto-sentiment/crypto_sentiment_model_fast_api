@@ -1,14 +1,10 @@
-from typing import Dict, Any, Iterable, Optional, cast
-from app.api.engine import ModelEngine, ModelsRegistry
+import pickle
+from typing import Any, Dict, Iterable, Optional, cast
 
+from app.api.engine import ModelEngine, ModelsRegistry
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from model_service.app.utils import get_logger
-from pathlib import Path
-import pickle
-
-logger = get_logger(Path(__file__).name)
 
 
 @ModelsRegistry.register("tf_idf")
@@ -23,7 +19,7 @@ class TfidfLogisticRegression(ModelEngine):
         pass
 
     def predict(self, X: Iterable) -> Dict[str, str]:
-        prediction = self.model.predict_proba(X).squeeze().round(4)
+        prediction = self.model.predict_proba(X).squeeze().round(self.cfg["inference"]["round_prob"])
         response_dict: Dict[str, str] = dict(zip(self.class_names, map(str, prediction.tolist())))
 
         return response_dict
@@ -34,7 +30,7 @@ class TfidfLogisticRegression(ModelEngine):
     def load(self, path: Optional[str] = None) -> None:
         path_to_saved_model = cast(str, self.cfg["path_to_model"] or path)
 
-        with open(path_to_saved_model, "wb") as f:
+        with open(path_to_saved_model, "rb") as f:
             self.model = pickle.load(f)
 
     def _initialize_model(self, cfg: Dict[str, Any]) -> Pipeline:

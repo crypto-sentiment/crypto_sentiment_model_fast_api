@@ -1,6 +1,5 @@
-from fastapi import FastAPI
-
 from app.api.model import model
+from fastapi import FastAPI
 
 app = FastAPI()
 

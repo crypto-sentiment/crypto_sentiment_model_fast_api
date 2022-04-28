@@ -1,37 +1,11 @@
-from app.models import *
+from typing import Dict, List, Tuple, cast
+
 from app.api.engine import ModelEngine, ModelsRegistry
 from app.api.news import News
-from fastapi import Header, APIRouter
-import mmh3
-from typing import List, Dict, Tuple
-
+from app.models import *  # noqa
+from fastapi import APIRouter
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-from typing import cast
-
-fake_db = [
-    {
-        "title_id": mmh3.hash("BTC dropbs by 10% today.", seed=17),
-        "title": "BTC dropbs by 10% today.",
-        "source": "bitcointicker",
-        "pub_time": "2022-04-28",
-        "label": "Positive",
-    },
-    {
-        "title_id": mmh3.hash("BTC dropbs by 10% today.", seed=17),
-        "title": "BTC dropbs by 10% today.",
-        "source": "bitcointicker",
-        "pub_time": "2022-04-28",
-        "label": "Neutral",
-    },
-    {
-        "title_id": mmh3.hash("BTC dropbs by 10% today.", seed=17),
-        "title": "BTC dropbs by 10% today.",
-        "source": "bitcointicker",
-        "pub_time": "2022-04-28",
-        "label": "Neutral",
-    },
-]
 
 
 def input2model_data(input_data: List[News]) -> Tuple[List[str], List[str]]:
@@ -47,8 +21,8 @@ def input2model_data(input_data: List[News]) -> Tuple[List[str], List[str]]:
     return data, labels
 
 
-def load_ml_model(pretrained: bool = False) -> ModelEngine:
-    initialize(config_path="../../../conf")
+def load_ml_model() -> ModelEngine:
+    initialize(config_path="../../conf")
     cfg = compose(config_name="config", return_hydra_config=True)
 
     dict_cfg = cast(dict, OmegaConf.to_container(cfg))
@@ -66,11 +40,6 @@ def load_ml_model(pretrained: bool = False) -> ModelEngine:
 ml_model = load_ml_model()
 
 model = APIRouter()
-
-
-@model.get("/", response_model=List[News])
-async def index():
-    return fake_db
 
 
 @model.post("/predict", status_code=200)

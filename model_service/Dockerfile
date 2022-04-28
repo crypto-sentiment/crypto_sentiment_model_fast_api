@@ -37,6 +37,7 @@ RUN chmod 777 /home/user
 ENV CONDA_AUTO_UPDATE_CONDA=false \
     PATH=/home/user/miniconda/bin:$PATH
 COPY environment.yml /app/environment.yml
+COPY setup.py /app/setup.py
 RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh \
     && chmod +x ~/miniconda.sh \
     && ~/miniconda.sh -b -p ~/miniconda \
@@ -44,3 +45,8 @@ RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py39
     && conda env update -n base -f /app/environment.yml \
     && rm /app/environment.yml \
     && conda clean -ya
+
+COPY app /app/app/
+COPY conf /app/conf/
+
+RUN pip install -e .

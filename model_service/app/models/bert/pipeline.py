@@ -1,31 +1,32 @@
-from .utils import build_object
-from datasets import load_metric
-from typing import Dict, Any
-from torch import Tensor
-import torch
+from typing import Any, Dict
 
-from transformers import get_scheduler
-from transformers.modeling_outputs import SequenceClassifierOutput
 import pytorch_lightning as pl
+import torch
+from datasets import load_metric
+from torch import Tensor
+from transformers import get_scheduler
+
+from .utils import build_object
 
 
 class SentimentPipeline(pl.LightningModule):
     """Class for training text classification models"""
 
-    def __init__(self, cfg: Dict[str, Any], num_training_steps: int):
+    def __init__(self, cfg: Dict[str, Any]):
         super().__init__()
 
         self.cfg = cfg
         self.model = build_object(cfg["model"], is_hugging_face=True)
         self.metric = load_metric("accuracy")
-        self.num_training_steps = num_training_steps
+
+        self.metrics = []
 
     def configure_optimizers(self):
         optimizer = build_object(self.cfg["optimizer"], params=self.model.parameters())
 
         lr_scheduler = get_scheduler(
             optimizer=optimizer,
-            num_training_steps=self.num_training_steps,
+            num_training_steps=self.trainer.estimated_stepping_batches,
             **self.cfg["scheduler"]["params"],
         )
 
@@ -42,7 +43,7 @@ class SentimentPipeline(pl.LightningModule):
 
     def training_step(self, batch: Dict[str, Tensor], batch_idx: int) -> Tensor:
 
-        outputs: SequenceClassifierOutput = self.model(**batch)
+        outputs = self.model(**batch)
 
         logits = outputs.logits
         predictions = torch.argmax(logits, dim=-1)

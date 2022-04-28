@@ -1,10 +1,10 @@
-import torch
-from typing import Dict, Any, Iterable
+from typing import Any, Dict, Iterable, Optional
 
-from torch.utils.data import Dataset
-from .utils import build_object
-from typing import Optional
+import torch
 from sklearn.preprocessing import LabelEncoder
+from torch.utils.data import Dataset
+
+from .utils import build_object
 
 
 class FinNewsDataset(Dataset):
@@ -21,11 +21,10 @@ class FinNewsDataset(Dataset):
         return item
 
     def __len__(self) -> int:
-        return len(self.encodings)
+        return len(self.encodings["input_ids"])
 
 
 def prepare_dataset(cfg: Dict[str, Any], data: Iterable[Any], labels: Optional[list] = None) -> Dataset:
-
     tokenizer = build_object(cfg["tokenizer"], is_hugging_face=True)
 
     encodings = tokenizer(data, truncation=True, padding=True)

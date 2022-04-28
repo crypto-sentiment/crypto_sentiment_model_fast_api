@@ -1,9 +1,5 @@
-from typing import Callable, Dict, Iterable, Optional, Any
 from abc import ABC, abstractmethod
-from typing import cast
-
-CLASS_NAME = str
-CLASS_PROBABILITY = float
+from typing import Any, Callable, Dict, Iterable, Optional, cast
 
 
 class ModelEngine(ABC):
@@ -12,7 +8,7 @@ class ModelEngine(ABC):
         pass
 
     @abstractmethod
-    def predict(self, X: Iterable) -> Dict[CLASS_NAME, CLASS_PROBABILITY]:
+    def predict(self, X: Iterable) -> Dict[str, str]:
         pass
 
     @abstractmethod
@@ -46,7 +42,7 @@ class ModelsRegistry:
 
     @classmethod
     def get_model(cls, name: str, cfg: Dict[str, Any]) -> "ModelEngine":
-        """Create moel."""
+        """Create model."""
         if name in cls.registry:
             return cast(Callable, cls.registry[name])(cfg)
         else:
