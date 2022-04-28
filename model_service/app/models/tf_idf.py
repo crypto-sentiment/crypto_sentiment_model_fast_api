@@ -4,8 +4,7 @@ from app.api.engine import ModelEngine, ModelsRegistry
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import StratifiedKFold, cross_val_score
-from model_service.app.utils import get_logger, timer
+from model_service.app.utils import get_logger
 from pathlib import Path
 import pickle
 
@@ -21,30 +20,7 @@ class TfidfLogisticRegression(ModelEngine):
         self.model: Pipeline = self._initialize_model(self.cfg)
 
     def fit(self, X: Iterable, y: Iterable, *args, **kwargs) -> None:
-        self.model.fit(X, y)
-
-        if self.cfg["cross_validation"]["cv_perform_cross_val"]:
-            cross_val_params = self.cfg["cross_validation"]
-
-            with timer("Cross-validation", logger=logger):
-                skf = StratifiedKFold(
-                    n_splits=cross_val_params["cv_n_splits"],
-                    shuffle=cross_val_params["cv_shuffle"],
-                    random_state=cross_val_params["cv_random_state"],
-                )
-
-                # Running cross-validation
-                cv_results = cross_val_score(
-                    estimator=self.model,
-                    X=X,
-                    y=y,
-                    cv=skf,
-                    n_jobs=cross_val_params["cv_n_jobs"],
-                    scoring=cross_val_params["cv_scoring"],
-                )
-
-                avg_cross_score = round(100 * cv_results.mean(), 2)
-                print("Average cross-validation {}: {}%.".format(cross_val_params["cv_scoring"], avg_cross_score))
+        pass
 
     def predict(self, X: Iterable) -> Dict[str, str]:
         prediction = self.model.predict_proba(X).squeeze().round(4)
@@ -53,10 +29,7 @@ class TfidfLogisticRegression(ModelEngine):
         return response_dict
 
     def save(self, path: Optional[str] = None) -> None:
-        path_to_saved_model = cast(str, self.cfg["path_to_model"] or path)
-
-        with open(path_to_saved_model, "wb") as f:
-            pickle.dump(self.model, f)
+        pass
 
     def load(self, path: Optional[str] = None) -> None:
         path_to_saved_model = cast(str, self.cfg["path_to_model"] or path)

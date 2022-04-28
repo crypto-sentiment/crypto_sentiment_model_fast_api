@@ -58,8 +58,7 @@ def load_ml_model(pretrained: bool = False) -> ModelEngine:
 
     ml_model = ModelsRegistry.get_model(model_choice, dict_cfg)
 
-    if pretrained:
-        ml_model.load()
+    ml_model.load()
 
     return ml_model
 
@@ -72,47 +71,6 @@ model = APIRouter()
 @model.get("/", response_model=List[News])
 async def index():
     return fake_db
-
-
-@model.post("/", status_code=201)
-async def add_news(payload: News):
-    news = payload.dict()
-    fake_db.append(news)
-    return {"id": len(fake_db) - 1}
-
-
-@model.post("/train", status_code=200)
-def train(input_data: List[News]):
-
-    data, labels = input2model_data(input_data)
-
-    ml_model.fit(data, labels)
-
-    return "", 200
-
-
-@model.post("/retrain", status_code=200)
-def retrain(input_data: List[News]):
-
-    data, labels = input2model_data(input_data)
-
-    ml_model = load_ml_model(pretrained=False)
-
-    ml_model.fit(data, labels)
-
-    return "", 200
-
-
-@model.post("/finetune", status_code=200)
-def finetune(input_data: List[News]):
-
-    data, labels = input2model_data(input_data)
-
-    ml_model = load_ml_model(pretrained=True)
-
-    ml_model.fit(data, labels)
-
-    return "", 200
 
 
 @model.post("/predict", status_code=200)

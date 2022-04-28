@@ -3,7 +3,6 @@ from datasets import load_metric
 from typing import Dict, Any
 from torch import Tensor
 import torch
-from pytorch_lightning import Callback
 
 from transformers import get_scheduler
 from transformers.modeling_outputs import SequenceClassifierOutput
@@ -95,23 +94,3 @@ class SentimentPipeline(pl.LightningModule):
             prog_bar=True,
             logger=False,
         )
-
-
-class MetricTracker(Callback):
-    def __init__(self):
-        self.collection = {
-            "train_loss": [],
-            "val_loss": [],
-            "train_acc": [],
-            "val_acc": [],
-        }
-
-    def _log_metrics(self, trainer, stage: str = "train"):
-        for key in (f"{stage}_acc", f"{stage}_loss"):
-            self.collection[key].append(trainer.callback_metrics[key].item())
-
-    def on_validation_epoch_end(self, trainer, module):
-        self._log_metrics(trainer, "val")
-
-    def on_train_epoch_end(self, trainer, module):
-        self._log_metrics(trainer, "train")
