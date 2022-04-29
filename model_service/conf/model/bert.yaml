@@ -4,7 +4,7 @@ epochs: 3
 train_batch_size: 8
 val_batch_size: 16
 seed: 42
-device: cuda
+device: cpu
 
 model_name: &model_name distilbert-base-uncased
 
