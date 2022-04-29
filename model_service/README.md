@@ -4,7 +4,7 @@
 ```
 /app/
 /conf/
-├── trained_models/
+/trained_models/
     ├── logit_tfidf_btc_sentiment.pkl
     └── bert.ckpt
 ```
