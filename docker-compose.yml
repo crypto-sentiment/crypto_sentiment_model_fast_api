@@ -5,7 +5,7 @@ services:
     build: ./model_service
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     volumes:
-      - ./model_service/trained_models:/app/trained_models
+      - /artifacts/models:/app/trained_models
     ports:
       - 8001:8000
-    runtime: nvidia
+    # runtime: nvidia
